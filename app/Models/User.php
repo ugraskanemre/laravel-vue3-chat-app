@@ -6,6 +6,9 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Auth;
+
+use App\Models\ChatMessage;
 
 class User extends Authenticatable
 {
@@ -43,5 +46,24 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+
+
+    public function sentMessages()
+    {
+        return $this->hasMany(ChatMessage::class, 'sender_id');
+    }
+
+    public function receivedMessages()
+    {
+        return $this->hasMany(ChatMessage::class, 'receiver_id');
+    }
+
+    public function lastMessage()
+    {
+        return $this->hasOne(ChatMessage::class, 'receiver_id') 
+            ->where('sender_id', Auth::id())
+            ->latest();
     }
 }
